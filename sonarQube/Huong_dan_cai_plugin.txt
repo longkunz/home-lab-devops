@@ -1,0 +1,10 @@
+B1: Comment 2 dòng:
+#SONAR_WEB_JAVAADDITIONALOPTS: -javaagent:./extensions/plugins/sonarqube-community-branch-plugin-1.18.0.jar=web
+#SONAR_CE_JAVAADDITIONALOPTS: -javaagent:./extensions/plugins/sonarqube-community-branch-plugin-1.18.0.jar=ce
+
+B2: Chạy docker compose up -d
+B3: Chạy lệnh 
+"docker cp ./sonarqube-community-branch-plugin-1.18.0.jar 64cf2c3c23ec:/opt/sonarqube/extensions/plugins"
+B4: Chạy docker compose down
+B5: Bỏ comment 2 dòng ở B1
+B6: Chạy docker compose up -d
