@@ -1,8 +1,33 @@
 version: "3"
 
 services:
+  setup:
+      profiles:
+        - setup
+      build:
+        context: setup/
+        args:
+          ELASTIC_VERSION: ${ELASTIC_VERSION}
+      init: true
+      volumes:
+        - ./setup/entrypoint.sh:/entrypoint.sh:ro,Z
+        - ./setup/lib.sh:/lib.sh:ro,Z
+        - ./setup/roles:/roles:ro,Z
+      environment:
+        ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+        LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+        KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+        METRICBEAT_INTERNAL_PASSWORD: ${METRICBEAT_INTERNAL_PASSWORD:-}
+        FILEBEAT_INTERNAL_PASSWORD: ${FILEBEAT_INTERNAL_PASSWORD:-}
+        HEARTBEAT_INTERNAL_PASSWORD: ${HEARTBEAT_INTERNAL_PASSWORD:-}
+        MONITORING_INTERNAL_PASSWORD: ${MONITORING_INTERNAL_PASSWORD:-}
+        BEATS_SYSTEM_PASSWORD: ${BEATS_SYSTEM_PASSWORD:-}
+      networks:
+        - elk
+      depends_on:
+        - elasticsearch
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.7.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.4
     container_name: elasticsearch
     ports:
       - 9200:9200
@@ -21,7 +46,7 @@ services:
       # see: https://www.elastic.co/guide/en/elasticsearch/reference/7.17/bootstrap-checks.html
       discovery.type: single-node
     networks:
-      - elk-network
+      - elk
     restart: unless-stopped
   logstash:
     build:
@@ -39,7 +64,7 @@ services:
       LS_JAVA_OPTS: -Xms256m -Xmx256m
       LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD}
     networks:
-      - elk-network
+      - elk
     depends_on:
       - elasticsearch
     restart: unless-stopped
@@ -53,13 +78,12 @@ services:
     environment:
       KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD}
     networks:
-      - elk-network
+      - elk
     depends_on:
       - elasticsearch
     restart: unless-stopped
 
 networks:
-  elk-network:
-    driver: bridge
+  elk:
 volumes:
   elasticsearch:

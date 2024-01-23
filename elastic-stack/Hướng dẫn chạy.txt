@@ -1,0 +1,20 @@
+1: Chạy lệnh
+docker compose up setup
+
+2: Chạy lệnh
+
+docker compose -f docker-compose.yml -f extensions/fleet/fleet-compose.yml -f extensions/fleet/agent-apmserver-compose.yml up -d
+
+
+
+
+
+
+
+
+
+
+
+
+
+docker exec -it <container_id> bin/elasticsearch-setup-passwords interactive
